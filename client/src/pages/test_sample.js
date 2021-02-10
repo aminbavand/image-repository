@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from "react-router-dom";
 
-class Signup extends Component {
+class test extends Component {
   state = {
     username: '',
     password: '',
+    values: '2',
     isSubmitted: false,
     gotoHome: false
   };
@@ -14,9 +15,9 @@ class Signup extends Component {
   
   async componentDidMount() {
 
-    // const val = await axios.get('/api/last-user-info');
-    // const a = val.data["users"]["name"];
-    // this.setState({ values: a});
+    const val = await axios.get('/api/last-user-info');
+    const a = val.data["users"]["name"];
+    this.setState({ values: a});
 
   }
 
@@ -31,11 +32,13 @@ class Signup extends Component {
     const response = await axios.post('api/user',{"username":username, "password":password},{}); 
     this.setState({ isSubmitted: true});
 
-    this.setState({ username: '' });
-    this.setState({ password: '' });
+    // this.setState({ username: '' });
+    // this.setState({ password: '' });
   
-    
   }
+
+
+
 
 
   goBackHome = async (event) =>{
@@ -48,40 +51,65 @@ class Signup extends Component {
 
 
 
+
+
   render() {
 
 
     if (this.state.isSubmitted){
-        return(<Redirect to = "/aftersignup"/>) ;
+        return(<Redirect to = "/newpage"/>) ;
     }
 
 
     if (this.state.gotoHome){
-        return(<Redirect to = "/home"/>) ;
+      return(<Redirect to = "/home"/>) ;
     }
+
 
 
 
     return (
       <div>
+        {/* <form onSubmit={this.handleSubmit}>
+          <label>Enter index:</label>
+
+          <input
+            value={this.state.inputNum}
+            onChange={(event) => this.setState({ inputNum: event.target.value })}
+          />
+
+
+          <button>Submit</button>
+        </form> */}
 
 
 
         <form  onSubmit={this.handleSubmit}>
-          create username
+          username
           <input
            value={this.state.username} type="text" name="username" id="username" 
            onChange={(event) => this.setState({ username: event.target.value })}
           />
-          create password
+          password
           <input
            value={this.state.password} type="password" name="password" id="password" 
            onChange={(event) => this.setState({ password: event.target.value })}
           />
-          <input type="submit" value="sign up" />
+          <input type="submit" value="Submit" />
         </form>
         
-        
+
+
+        {/* <h3>Calculated Values:</h3> */}
+
+
+
+
+
+
+        <div>
+          The last user is {this.state.values}
+        </div>
 
 
         <div>
@@ -92,10 +120,9 @@ class Signup extends Component {
 
 
 
-
       </div>
     );
   }
 }
 
-export default Signup;
+export default test;

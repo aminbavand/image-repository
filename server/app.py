@@ -92,7 +92,8 @@ def create_user():
 
 
 @app.route('/user/<public_id>', methods=['GET'])
-def get_one_user(public_id):
+@token_required
+def get_one_user(current_user,public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -110,7 +111,8 @@ def get_one_user(public_id):
 
 
 @app.route('/user/<public_id>', methods=['DELETE'])
-def delete_user(public_id):
+@token_required
+def delete_user(current_user,public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -146,6 +148,9 @@ def login():
         return jsonify({'token' : token})
 
     return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
+
+
+
 
 
 

@@ -2,21 +2,21 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from "react-router-dom";
 
-class Main extends Component {
+class Login extends Component {
   state = {
     username: '',
     password: '',
-    values: '2',
-    isSubmitted: false
+    isSubmitted: false,
+    gotoHome: false
   };
 
 
   
   async componentDidMount() {
 
-    const val = await axios.get('/api/last-user-info');
-    const a = val.data["users"]["name"];
-    this.setState({ values: a});
+    // const val = await axios.get('/api/last-user-info');
+    // const a = val.data["users"]["name"];
+    // this.setState({ values: a});
 
   }
 
@@ -28,12 +28,20 @@ class Main extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    const response = await axios.post('api/user',{"username":username, "password":password},{}); 
+    const response = await axios.get('api/login',{"username":username, "password":password},{}); 
     this.setState({ isSubmitted: true});
 
-    // this.setState({ username: '' });
-    // this.setState({ password: '' });
+    this.setState({ username: '' });
+    this.setState({ password: '' });
   
+    
+  }
+
+
+  goBackHome = async (event) =>{
+    event.preventDefault();
+
+    this.setState({ gotoHome: true});
   }
 
 
@@ -44,25 +52,18 @@ class Main extends Component {
 
 
     if (this.state.isSubmitted){
-        return(<Redirect to = "/newpage"/>) ;
+        return(<Redirect to = "/afterlogin"/>) ;
     }
 
+
+    if (this.state.gotoHome){
+        return(<Redirect to = "/home"/>) ;
+    }
 
 
 
     return (
       <div>
-        {/* <form onSubmit={this.handleSubmit}>
-          <label>Enter index:</label>
-
-          <input
-            value={this.state.inputNum}
-            onChange={(event) => this.setState({ inputNum: event.target.value })}
-          />
-
-
-          <button>Submit</button>
-        </form> */}
 
 
 
@@ -74,24 +75,21 @@ class Main extends Component {
           />
           password
           <input
-           value={this.state.password} type="text" name="password" id="password" 
+           value={this.state.password} type="password" name="password" id="password" 
            onChange={(event) => this.setState({ password: event.target.value })}
           />
-          <input type="submit" value="Submit" />
+          <input type="submit" value="login" />
         </form>
+        
         
 
 
-        {/* <h3>Calculated Values:</h3> */}
-
-
-
-
-
-
         <div>
-          The last user is {this.state.values}
+          <form  onSubmit={this.goBackHome}>        
+            <input type="submit" value="go to home" />
+          </form>
         </div>
+
 
 
 
@@ -100,4 +98,4 @@ class Main extends Component {
   }
 }
 
-export default Main;
+export default Login;
