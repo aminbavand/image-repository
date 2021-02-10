@@ -1,7 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import Main from './main';
+import Main from './pages/main';
+import newPage from './pages/newpage';
 
 function App() {
   return (
@@ -11,8 +11,11 @@ function App() {
 
         </header> */}
         
+        <div>
+          <Route exact path="/" component={Main} />
+          <Route exact path="/newpage" component={newPage} />
+        </div>
 
-        <Route exact path="/" component={Main} />
 
       </div>
     </Router>

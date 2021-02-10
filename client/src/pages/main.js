@@ -1,30 +1,15 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Redirect } from "react-router-dom";
 
 class Main extends Component {
   state = {
     username: '',
     password: '',
-    isLogin: false,
-    values: '2'
+    values: '2',
+    isSubmitted: false
   };
 
-
-
-  // async componentDidMount() { 
-
-  //   const response = await fetch('/api/values');
-  //   // const values1 = await response.get_json;
-  //   // this.setState({ data: json });
-
-  // }
-
-
-  // async componentDidMount() {
-  //   const val = await axios.get('/api/login');
-  //   this.setState({ values: val.data["message"] });
-  //   console.log("hello");
-  // }
 
   
   async componentDidMount() {
@@ -43,19 +28,11 @@ class Main extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    console.log(data);
-    console.log(username);
-    console.log(password);
-    const response = await axios.post('api/login',{"username":username, "password":password},{});
-    console.log(response.data);
-    // this.state.isLogin = true; 
-    this.setState({ isLogin: true });
-  
-    // return <Redirect to = "/newpage"/>
-    console.log(response.data);
+    const response = await axios.post('api/user',{"username":username, "password":password},{}); 
+    this.setState({ isSubmitted: true});
 
-    this.setState({ username: '' });
-    this.setState({ password: '' });
+    // this.setState({ username: '' });
+    // this.setState({ password: '' });
   
   }
 
@@ -64,6 +41,15 @@ class Main extends Component {
 
 
   render() {
+
+
+    if (this.state.isSubmitted){
+        return(<Redirect to = "/newpage"/>) ;
+    }
+
+
+
+
     return (
       <div>
         {/* <form onSubmit={this.handleSubmit}>
