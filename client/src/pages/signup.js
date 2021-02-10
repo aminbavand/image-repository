@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from "react-router-dom";
 
-class Main extends Component {
+class Signup extends Component {
   state = {
     username: '',
     password: '',
