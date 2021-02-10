@@ -10,7 +10,7 @@ class newPage extends Component {
   render() {
 
     return (
-      <div> Welcome to this page! </div>
+      <div> New user created! </div>
       
 
     );
