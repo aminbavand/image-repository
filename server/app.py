@@ -22,7 +22,7 @@ class User(db.Model):
     public_id = db.Column(db.String(50))
     name = db.Column(db.String(50))
     password = db.Column(db.String(80))
-    # admin = db.Column(db.Boolean)
+    admin = db.Column(db.Boolean)
 
 
 
@@ -65,9 +65,8 @@ def get_all_users():
         user_data = {}
         user_data['public_id'] = user.public_id
         user_data['name'] = user.name
-        user_data['password'] = user.password
-        
-        # user_data['admin'] = user.admin
+        user_data['password'] = user.password        
+        user_data['admin'] = user.admin
         output.append(user_data)
 
     return jsonify({'users': output})
@@ -80,85 +79,12 @@ def create_user():
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
 
-    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password)
+    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
 
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({'message' : 'new user created'})
-
-
-
-
-
-@app.route('/user/<public_id>', methods=['GET'])
-@token_required
-def get_one_user(current_user,public_id):
-
-    user = User.query.filter_by(public_id=public_id).first()
-
-    if not user:
-        return jsonify({'message' : 'no user found'})
-
-    user_data = {}
-    user_data['public_id'] = user.public_id
-    user_data['name'] = user.name
-    user_data['password'] = user.password
-
-    return jsonify({'user' : user_data})
-
-
-
-
-@app.route('/user/<public_id>', methods=['DELETE'])
-@token_required
-def delete_user(current_user,public_id):
-
-    user = User.query.filter_by(public_id=public_id).first()
-
-    if not user:
-        return jsonify({'message' : 'no user found'})
-
-    db.session.delete(user)
-    db.session.commit()
-
-    return jsonify({'message' : 'The user has been deleted!'})
-
-
-
-
-
-
-
-@app.route('/login')
-def login():
-    auth = request.authorization
-
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
-
-    user = User.query.filter_by(name=auth.username).first()
-
-    if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
-
-    if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-
-        return jsonify({'token' : token})
-
-    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login required!"'})
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -178,31 +104,117 @@ def delete_all_users():
 
 
 
+@app.route('/user/<public_id>', methods=['PUT'])
+def promote_user(public_id):
+
+    user = User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' : 'No user found!'})
+
+    user.admin = True
+    db.session.commit()
+
+    return jsonify({'message' : 'The user has been promoted!'})
 
 
 
+@app.route('/user/<public_id>', methods=['GET'])
+def get_one_user(public_id):
 
+    user = User.query.filter_by(public_id=public_id).first()
 
+    if not user:
+        return jsonify({'message' : 'no user found'})
 
-
-
-
-
-
-@app.route('/last-user-info', methods=['GET'])
-def last_user():
-
-    users = User.query.all()
-    output = []
-
-    user = users[-1]
     user_data = {}
+    user_data['public_id'] = user.public_id
     user_data['name'] = user.name
     user_data['password'] = user.password
-    # user_data['admin'] = user.admin
-    output.append(user_data)
+    user_data['admin'] = user.admin
 
-    return jsonify({'users': user_data})
+    return jsonify({'user' : user_data})
+
+
+
+
+@app.route('/user/<public_id>', methods=['DELETE'])
+def delete_user(public_id):
+
+    user = User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' : 'no user found'})
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({'message' : 'The user has been deleted!'})
+
+
+
+
+
+@app.route('/last-user-info', methods=['GET','POST'])
+def last_user():
+    if request.method=='POST':
+        data = request.get_json()
+
+        hashed_password = generate_password_hash(data['password'], method='sha256')
+
+        new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({'message' : 'The user has been created!'})
+
+    if request.method=='GET':
+        users = User.query.all()
+        output = []
+
+        user = users[-1]
+        user_data = {}
+        user_data['name'] = user.name
+        user_data['password'] = user.password
+        user_data['admin'] = user.admin
+        output.append(user_data)
+
+        return jsonify({'users': user_data})
+
+    
+
+
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    auth = request.get_json()
+    
+    if not auth or not auth['username'] or not auth['password']:
+        return make_response('Could not verify', 401)
+
+
+    user = User.query.filter_by(name=auth['username']).first()
+
+
+    if not user:
+        return make_response('Could not verify', 401)
+
+    if check_password_hash(user.password, auth['password']):
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
+
+        return jsonify({'token' : token})
+
+    return make_response('Could not verify', 401)
+
+
+
+
+
+
+
+
 
 
 

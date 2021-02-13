@@ -4,7 +4,8 @@ import { Redirect } from "react-router-dom";
 
 class AfterLogin extends Component {
     state = {
-        gotoHome: false
+        gotoHome: false,
+        gotoSignup: false
       };
     
     
@@ -13,6 +14,12 @@ class AfterLogin extends Component {
         event.preventDefault();
     
         this.setState({ gotoHome: true});  
+      }
+
+      handlgoSignup = async (event) =>{
+        event.preventDefault();
+    
+        this.setState({ gotoSignup: true});  
       }
     
     
@@ -24,6 +31,10 @@ class AfterLogin extends Component {
         if (this.state.gotoHome){
             return(<Redirect to = "/home"/>) ;
         }
+
+        if (this.state.gotoSignup){
+          return(<Redirect to = "/signup"/>) ;
+      }
     
     
     
@@ -37,6 +48,10 @@ class AfterLogin extends Component {
             
             <form  onSubmit={this.handlgoHome}>        
             <input type="submit" value="go to home" />
+            </form>
+
+            <form  onSubmit={this.handlgoSignup}>        
+            <input type="submit" value="go to sign up" />
             </form>
            
 

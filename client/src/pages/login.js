@@ -28,7 +28,7 @@ class Login extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    const response = await axios.get('api/login',{"username":username, "password":password},{}); 
+    const response = await axios.post('api/login',{"username":username, "password":password},{}); 
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
