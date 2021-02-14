@@ -26,7 +26,8 @@ class Login extends Component {
     this.setState({ publicID: response.data["publicID"]});
     this.setState({ token: response.data["token"]});
 
-    console.log(this.state.token)
+    // console.log(this.state.token)
+    console.log(this.state.publicID)
     // console.log(this.state.publicID)
 
 
