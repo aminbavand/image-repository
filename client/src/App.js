@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import test from './pages/test_sample';
 import AfterSignup from './pages/after_signup';
 import Signup from './pages/signup';
-import Startup from './pages/startpage';
-import AfterLogin from './pages/after_login';
+import Home from './pages/homepage';
 import Login from './pages/login';
+import UserPage from './pages/userpage';
 
 function App() {
   return (
@@ -19,9 +19,9 @@ function App() {
           <Route exact path="/" component={test} />
           <Route exact path="/aftersignup" component={AfterSignup} />
           <Route exact path="/signup" component={Signup} />
-          <Route exact path="/home" component={Startup} />
+          <Route exact path="/home" component={Home} />
           <Route exact path="/login" component={Login} />
-          <Route exact path="/afterlogin" component={AfterLogin} />
+          <Route path="/home/:userId" component={UserPage} />
         </div>
 
 

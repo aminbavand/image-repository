@@ -55,7 +55,8 @@ def token_required(f):
 
 
 @app.route('/user', methods=['GET'])
-def get_all_users():
+@token_required
+def get_all_users(current_user):
 
     users = User.query.all()
 
@@ -73,24 +74,10 @@ def get_all_users():
 
 
 
-@app.route('/user', methods=['POST'])
-def create_user():
-    data = request.get_json()
-
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-
-    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'message' : 'new user created'})
-
-
-
 
 @app.route('/user', methods=['DELETE'])
-def delete_all_users():
+@token_required
+def delete_all_users(current_user):
 
     users = User.query.all()
 
@@ -105,7 +92,8 @@ def delete_all_users():
 
 
 @app.route('/user/<public_id>', methods=['PUT'])
-def promote_user(public_id):
+@token_required
+def promote_user(current_user, public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -120,7 +108,8 @@ def promote_user(public_id):
 
 
 @app.route('/user/<public_id>', methods=['GET'])
-def get_one_user(public_id):
+@token_required
+def get_one_user(current_user, public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -139,7 +128,8 @@ def get_one_user(public_id):
 
 
 @app.route('/user/<public_id>', methods=['DELETE'])
-def delete_user(public_id):
+@token_required
+def delete_user(current_user, public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -156,7 +146,8 @@ def delete_user(public_id):
 
 
 @app.route('/last-user-info', methods=['GET','POST'])
-def last_user():
+@token_required
+def last_user(current_user):
     if request.method=='POST':
         data = request.get_json()
 
@@ -189,8 +180,10 @@ def last_user():
 
 @app.route('/login', methods=['POST'])
 def login():
+
+
     auth = request.get_json()
-    
+
     if not auth or not auth['username'] or not auth['password']:
         return make_response('Could not verify', 401)
 
@@ -212,8 +205,22 @@ def login():
 
 
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+
+    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
+
+    db.session.add(new_user)
+    db.session.commit()
 
 
+
+    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
+
+    return jsonify({'token' : token})
 
 
 

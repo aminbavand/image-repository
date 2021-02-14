@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import UserPage from './userpage';
 
 class Login extends Component {
   state = {
     username: '',
     password: '',
-    isSubmitted: false,
-    gotoHome: false
+    isSubmitted: false
   };
 
 
   
-  async componentDidMount() {
+  // async componentDidMount() {
 
-    // const val = await axios.get('/api/last-user-info');
-    // const a = val.data["users"]["name"];
-    // this.setState({ values: a});
+  //   const val = await axios.get('/api/login');
+  //   // const a = val.data["users"]["name"];
+  //   // this.setState({ values: a});
 
-  }
+  // }
 
 
 
@@ -29,19 +30,14 @@ class Login extends Component {
     const username=data.get('username');
     const password=data.get('password');
     const response = await axios.post('api/login',{"username":username, "password":password},{}); 
+    console.log(response)
+    // const token = await axios.get('/api/login');
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
     this.setState({ password: '' });
   
     
-  }
-
-
-  goBackHome = async (event) =>{
-    event.preventDefault();
-
-    this.setState({ gotoHome: true});
   }
 
 
@@ -52,12 +48,8 @@ class Login extends Component {
 
 
     if (this.state.isSubmitted){
-        return(<Redirect to = "/afterlogin"/>) ;
-    }
-
-
-    if (this.state.gotoHome){
-        return(<Redirect to = "/home"/>) ;
+      const a = "/home/:66666"      
+      return(<Redirect to = {a}/>) ;
     }
 
 
@@ -84,11 +76,8 @@ class Login extends Component {
         
 
 
-        <div>
-          <form  onSubmit={this.goBackHome}>        
-            <input type="submit" value="go to home" />
-          </form>
-        </div>
+        <li><Link to="/home">Home</Link></li>
+        <li><Link to="/signup">Sign Up page</Link></li>
 
 
 

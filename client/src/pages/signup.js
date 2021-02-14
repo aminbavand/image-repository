@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 class Signup extends Component {
   state = {
     username: '',
     password: '',
     isSubmitted: false,
-    gotoHome: false
   };
 
 
   
-  async componentDidMount() {
+  // async componentDidMount() {
 
     // const val = await axios.get('/api/last-user-info');
     // const a = val.data["users"]["name"];
     // this.setState({ values: a});
 
-  }
+  // }
 
 
 
@@ -28,7 +28,13 @@ class Signup extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    const response = await axios.post('api/user',{"username":username, "password":password},{}); 
+    // const a = 'wefwefwuifiuwfowfoin'
+    // const options = {
+    //   headers: {'x-access-token': a}
+    // };
+    // console.log(options["headers"]['x-access-token'])
+    const response = await axios.post('api/signup',{"username":username, "password":password},{}); 
+    console.log(response)
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
@@ -38,28 +44,14 @@ class Signup extends Component {
   }
 
 
-  goBackHome = async (event) =>{
-    event.preventDefault();
-
-    this.setState({ gotoHome: true});
-  }
-
-
-
 
 
   render() {
 
 
     if (this.state.isSubmitted){
-        return(<Redirect to = "/aftersignup"/>) ;
+        return(<Redirect to = "/home/:4"/>) ;
     }
-
-
-    if (this.state.gotoHome){
-        return(<Redirect to = "/home"/>) ;
-    }
-
 
 
     return (
@@ -84,11 +76,8 @@ class Signup extends Component {
         
 
 
-        <div>
-          <form  onSubmit={this.goBackHome}>        
-            <input type="submit" value="go to home" />
-          </form>
-        </div>
+        <li><Link to="/home">Home</Link></li>
+        <li><Link to="/login">Login Page</Link></li>
 
 
 
