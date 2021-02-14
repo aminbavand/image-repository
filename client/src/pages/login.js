@@ -2,25 +2,15 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import UserPage from './userpage';
 
 class Login extends Component {
   state = {
     username: '',
     password: '',
-    isSubmitted: false
+    isSubmitted: false,
+    token: '',
+    publicID: ''
   };
-
-
-  
-  // async componentDidMount() {
-
-  //   const val = await axios.get('/api/login');
-  //   // const a = val.data["users"]["name"];
-  //   // this.setState({ values: a});
-
-  // }
-
 
 
 
@@ -29,9 +19,17 @@ class Login extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
+
+
     const response = await axios.post('api/login',{"username":username, "password":password},{}); 
-    console.log(response)
-    // const token = await axios.get('/api/login');
+    
+    this.setState({ publicID: response.data["publicID"]});
+    this.setState({ token: response.data["token"]});
+
+    console.log(this.state.token)
+    // console.log(this.state.publicID)
+
+
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
@@ -48,8 +46,8 @@ class Login extends Component {
 
 
     if (this.state.isSubmitted){
-      const a = "/home/:66666"      
-      return(<Redirect to = {a}/>) ;
+      const url = "/home/" + this.state.publicID;
+      return(<Redirect to = {{pathname: url, data:this.state.token}}/>) ;
     }
 
 

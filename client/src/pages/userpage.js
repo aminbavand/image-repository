@@ -15,9 +15,12 @@ class UserPage extends Component {
           <div>
     
             <div>
-              You have just logged in or signed up.
+              You have just logged in or signed up.   
+              token is {this.props.location.data}                       
             </div>
-            
+            {/* {console.log(this.state.token)} */}
+
+            {/* {console.log(this.props.location.data)} */}
             
             <li><Link to="/home">Home</Link></li>
             <li><Link to="/login">Login Page</Link></li>

@@ -197,7 +197,7 @@ def login():
     if check_password_hash(user.password, auth['password']):
         token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
 
-        return jsonify({'token' : token})
+        return jsonify({'token' : token, 'publicID': user.public_id})
 
     return make_response('Could not verify', 401)
 
@@ -220,7 +220,7 @@ def signup():
 
     token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
 
-    return jsonify({'token' : token})
+    return jsonify({'token' : token, 'publicID': new_user.public_id})
 
 
 

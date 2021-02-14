@@ -8,6 +8,7 @@ class Signup extends Component {
     username: '',
     password: '',
     isSubmitted: false,
+    publicID: '1'
   };
 
 
@@ -34,7 +35,8 @@ class Signup extends Component {
     // };
     // console.log(options["headers"]['x-access-token'])
     const response = await axios.post('api/signup',{"username":username, "password":password},{}); 
-    console.log(response)
+    // console.log(response.data["token"])
+    this.setState({ publicID: response.data["publicID"]});
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
@@ -50,7 +52,8 @@ class Signup extends Component {
 
 
     if (this.state.isSubmitted){
-        return(<Redirect to = "/home/:4"/>) ;
+      const url = "/home/:" + this.state.publicID;
+      return(<Redirect to = {url}/>) ;
     }
 
 
