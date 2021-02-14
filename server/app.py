@@ -58,6 +58,8 @@ def token_required(f):
 @app.route('/user', methods=['GET'])
 @token_required
 def get_all_users(current_user):
+    if not current_user.admin:
+        return jsonify({'message' : 'Cannot perform that function!'})
 
     users = User.query.all()
 
@@ -79,6 +81,8 @@ def get_all_users(current_user):
 @app.route('/user', methods=['DELETE'])
 @token_required
 def delete_all_users(current_user):
+    if not current_user.admin:
+        return jsonify({'message' : 'Cannot perform that function!'})
 
     users = User.query.all()
 
@@ -95,6 +99,8 @@ def delete_all_users(current_user):
 @app.route('/user/<public_id>', methods=['PUT'])
 @token_required
 def promote_user(current_user, public_id):
+    if not current_user.admin:
+        return jsonify({'message' : 'Cannot perform that function!'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -111,6 +117,8 @@ def promote_user(current_user, public_id):
 @app.route('/user/<public_id>', methods=['GET'])
 @token_required
 def get_one_user(current_user,public_id):
+    if not current_user.admin and current_user.public_id is not public_id:
+        return jsonify({'message' : 'Cannot perform that function!'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -131,6 +139,9 @@ def get_one_user(current_user,public_id):
 @app.route('/user/<public_id>', methods=['DELETE'])
 @token_required
 def delete_user(current_user, public_id):
+    if not current_user.admin and current_user.public_id is not public_id:
+        return jsonify({'message' : 'Cannot perform that function!'})
+
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -141,6 +152,23 @@ def delete_user(current_user, public_id):
     db.session.commit()
 
     return jsonify({'message' : 'The user has been deleted!'})
+
+
+
+
+@app.route('/imageupload', methods=['POST'])
+def image_upload():
+
+    data = request.files['myImage']
+    imagestr = './images/' + data.name
+    data.save(imagestr)
+
+    return jsonify({'message' : 'The user has been deleted!'})
+
+
+
+
+
 
 
 

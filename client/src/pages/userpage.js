@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import ReactUploadImage from './imageUpload';
 
 
 class UserPage extends Component {
@@ -79,10 +80,20 @@ class UserPage extends Component {
             </button> */}
 
 
+
+            <ReactUploadImage />
+
+
+
             
             <li><Link to="/home">Home</Link></li>
             <li><Link to="/login">Login Page</Link></li>
             <li><Link to="/signup">Sign Up Page</Link></li>
+
+
+
+
+
         
     
           </div>
