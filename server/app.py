@@ -41,7 +41,8 @@ def token_required(f):
             return jsonify({'message' : 'Token is missing!'}), 401
 
         try: 
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            # data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")
             current_user = User.query.filter_by(public_id=data['public_id']).first()
         except:
             return jsonify({'message' : 'Token is invalid!'}), 401
@@ -109,7 +110,7 @@ def promote_user(current_user, public_id):
 
 @app.route('/user/<public_id>', methods=['GET'])
 @token_required
-def get_one_user(current_user, public_id):
+def get_one_user(current_user,public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -146,8 +147,7 @@ def delete_user(current_user, public_id):
 
 
 @app.route('/last-user-info', methods=['GET','POST'])
-@token_required
-def last_user(current_user):
+def last_user():
     if request.method=='POST':
         data = request.get_json()
 
@@ -195,7 +195,14 @@ def login():
         return make_response('Could not verify', 401)
 
     if check_password_hash(user.password, auth['password']):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
+
+        # data_decodeeee = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")        
+        # current_userrrr = User.query.filter_by(public_id=data_decodeeee['public_id']).first()
+        # user_data = {}
+        # user_data['name'] = current_userrrr.name
+        # user_data['password'] = current_userrrr.password
+        # user_data['admin'] = current_userrrr.admin
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
@@ -219,6 +226,8 @@ def signup():
 
 
     token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
+
+
 
     return jsonify({'token' : token, 'publicID': new_user.public_id})
 

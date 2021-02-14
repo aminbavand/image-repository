@@ -30,7 +30,7 @@ class test extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    const response = await axios.post('api/last-user-info',{"username":username, "password":password},{}); 
+    const response = await axios.post('api/user',{"username":username, "password":password},{}); 
     this.setState({ isSubmitted: true});
 
     // this.setState({ username: '' });

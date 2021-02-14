@@ -8,18 +8,9 @@ class Signup extends Component {
     username: '',
     password: '',
     isSubmitted: false,
-    publicID: '1'
+    token: '',
+    publicID: ''
   };
-
-
-  
-  // async componentDidMount() {
-
-    // const val = await axios.get('/api/last-user-info');
-    // const a = val.data["users"]["name"];
-    // this.setState({ values: a});
-
-  // }
 
 
 
@@ -29,14 +20,16 @@ class Signup extends Component {
     const data=new FormData(event.target);
     const username=data.get('username');
     const password=data.get('password');
-    // const a = 'wefwefwuifiuwfowfoin'
-    // const options = {
-    //   headers: {'x-access-token': a}
-    // };
-    // console.log(options["headers"]['x-access-token'])
+
     const response = await axios.post('api/signup',{"username":username, "password":password},{}); 
-    // console.log(response.data["token"])
+
+
     this.setState({ publicID: response.data["publicID"]});
+    this.setState({ token: response.data["token"]});
+
+    console.log(this.state.token)
+    console.log(this.state.publicID)
+
     this.setState({ isSubmitted: true});
 
     this.setState({ username: '' });
@@ -52,8 +45,8 @@ class Signup extends Component {
 
 
     if (this.state.isSubmitted){
-      const url = "/home/:" + this.state.publicID;
-      return(<Redirect to = {url}/>) ;
+      const url = "/home/" + this.state.publicID;
+      return(<Redirect to = {{pathname: url, data:this.state.token}}/>);
     }
 
 

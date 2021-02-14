@@ -21,15 +21,13 @@ class Login extends Component {
     const password=data.get('password');
 
 
-    const response = await axios.post('api/login',{"username":username, "password":password},{}); 
+    const response = await axios.post('/api/login',{"username":username, "password":password},{}); 
     
     this.setState({ publicID: response.data["publicID"]});
     this.setState({ token: response.data["token"]});
 
     // console.log(this.state.token)
-    console.log(this.state.publicID)
     // console.log(this.state.publicID)
-
 
     this.setState({ isSubmitted: true});
 
@@ -48,7 +46,7 @@ class Login extends Component {
 
     if (this.state.isSubmitted){
       const url = "/home/" + this.state.publicID;
-      return(<Redirect to = {{pathname: url, data:this.state.token}}/>) ;
+      return(<Redirect to = {{pathname: url, data:this.state.token}}/>);
     }
 
 
