@@ -17,17 +17,23 @@ class Login extends Component {
   handleSubmit = async (event) =>{
     event.preventDefault();
     const data=new FormData(event.target);
-    const username=data.get('username');
-    const password=data.get('password');
+    const username_data=data.get('username');
+    const password_data=data.get('password');
 
 
-    const response = await axios.post('/api/login',{"username":username, "password":password},{}); 
-    
+    // const response = await axios.post('/api/login',{"username":username_data, "password":password_data},{}); 
+
+    const response = await axios.post('/api/login', {}, {
+      auth: {
+        username: username_data,
+        password: password_data
+      }
+    });
+
+
+
     this.setState({ publicID: response.data["publicID"]});
     this.setState({ token: response.data["token"]});
-
-    // console.log(this.state.token)
-    // console.log(this.state.publicID)
 
     this.setState({ isSubmitted: true});
 

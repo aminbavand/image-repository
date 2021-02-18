@@ -117,8 +117,8 @@ def promote_user(current_user, public_id):
 @app.route('/user/<public_id>', methods=['GET'])
 @token_required
 def get_one_user(current_user,public_id):
-    if not current_user.admin and current_user.public_id is not public_id:
-        return jsonify({'message' : 'Cannot perform that function!'})
+    # if not current_user.admin and current_user.public_id is not public_id:
+    #     return jsonify({'message' : 'Cannot perform that function!'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -210,31 +210,26 @@ def last_user():
 def login():
 
 
-    auth = request.get_json()
+    auth = request.authorization
 
-    if not auth or not auth['username'] or not auth['password']:
+    if not auth or not auth.username or not auth.password:
         return make_response('Could not verify', 401)
 
 
-    user = User.query.filter_by(name=auth['username']).first()
+    user = User.query.filter_by(name=auth.username).first()
 
 
     if not user:
         return make_response('Could not verify', 401)
 
-    if check_password_hash(user.password, auth['password']):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
-
-        # data_decodeeee = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")        
-        # current_userrrr = User.query.filter_by(public_id=data_decodeeee['public_id']).first()
-        # user_data = {}
-        # user_data['name'] = current_userrrr.name
-        # user_data['password'] = current_userrrr.password
-        # user_data['admin'] = current_userrrr.admin
+    if check_password_hash(user.password, auth.password):
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.2)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
     return make_response('Could not verify', 401)
+
+
 
 
 

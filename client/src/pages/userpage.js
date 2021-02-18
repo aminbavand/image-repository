@@ -7,9 +7,9 @@ import ReactUploadImage from './imageUpload';
 class UserPage extends Component {
     state = {
       token: this.props.location.data,
-      publicID: this.props.match.params["userId"],
+      publicID: '',
       name: '',
-      admin: false
+      admin: ''
       };
     
     
@@ -19,22 +19,25 @@ class UserPage extends Component {
 
 
       async componentDidMount() {
+        if (typeof this.state.token != 'undefined'){
+          localStorage.setItem('TOKEN', this.state.token)
+        }
 
-        const url = "/api/user/" + this.state.publicID;      
 
 
-        console.log('123hello')
+        const url = "/api/user/" + this.props.match.params["userId"];      
+
+
         const response = await axios.get(url, {
           headers: {
-            'x-access-token': this.state.token
+            'x-access-token': localStorage.getItem('TOKEN')
           }
           });
+  
         this.setState({ admin: response.data['user']['admin'] });
         this.setState({ name: response.data['user']['name'] });
+        this.setState({ publicID: response.data['user']['public_id'] });
 
-        // console.log(response.data['user']['admin'])
-        // console.log(response.data['user']['name'])
-        // console.log(response.data['user']['public_id'])
 
 
       }
@@ -55,9 +58,9 @@ class UserPage extends Component {
             You have just logged in or signed up.
             
 
-            <h3>
+            <h2>
               user information:
-            </h3>
+            </h2>
 
             <div>
               NAME: {this.state.name}
@@ -71,13 +74,7 @@ class UserPage extends Component {
               ADMIN: {String(this.state.admin)}
             </div>
 
-            
-            
-            
-            {/* <button 
-              onClick={ () => this.handleIncrement({id : 1})} >
-              increment
-            </button> */}
+  
 
 
 
