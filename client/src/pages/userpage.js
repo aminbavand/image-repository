@@ -14,9 +14,6 @@ class UserPage extends Component {
       };
     
     
-      
-
-
 
 
       async componentDidMount() {
@@ -29,28 +26,32 @@ class UserPage extends Component {
         const url = "/api/user/" + this.props.match.params["userId"];      
 
 
-        const response = await axios.get(url, {
+        await axios.get(url, {
           headers: {
             'x-access-token': localStorage.getItem('TOKEN')
           }
-        });
-
-        this.setState({ isLoggedIn: true });
-
-        console.log(this.state.isLoggedIn)
+        })
+        .then((response) => {
+          this.setState({ admin: response.data['user']['admin'] });
+          this.setState({ name: response.data['user']['name'] });
+          this.setState({ publicID: response.data['user']['public_id'] });
+          this.setState({ isLoggedIn: true });
+        }).catch((error) => {
+          this.setState({ isLoggedIn: false });
+          });
+        
+        
 
         
-        console.log(response)
 
-        this.setState({ admin: response.data['user']['admin'] });
-        this.setState({ name: response.data['user']['name'] });
-        this.setState({ publicID: response.data['user']['public_id'] });
+
+        
       }
 
       renderUploadImage() {
         if (this.state.isLoggedIn) {
           return (
-          <ReactUploadImage />
+          <ReactUploadImage token={localStorage.getItem('TOKEN')}/>
           );
         }
       }
@@ -86,7 +87,7 @@ class UserPage extends Component {
         if (this.state.isLoggedIn==false) {
           return (
           <h1>
-            Session Time Out!
+            Please Log In!
           </h1>
           );
         }
@@ -104,9 +105,7 @@ class UserPage extends Component {
         return (
           <div>
     
-            
-      
-
+          
             {this.renderUserInfo()}
 
 
@@ -120,14 +119,6 @@ class UserPage extends Component {
             <li><Link to="/signup">Sign Up Page</Link></li>
 
 
-            
-
-
-
-
-
-        
-    
           </div>
         );
 

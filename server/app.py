@@ -157,7 +157,8 @@ def delete_user(current_user, public_id):
 
 
 @app.route('/imageupload', methods=['POST'])
-def image_upload():
+@token_required
+def image_upload(current_user):
 
     data = request.files['myImage']
     imagestr = './images/' + data.name
