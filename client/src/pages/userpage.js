@@ -9,7 +9,8 @@ class UserPage extends Component {
       token: this.props.location.data,
       publicID: '',
       name: '',
-      admin: ''
+      admin: '',
+      isLoggedIn: false
       };
     
     
@@ -23,7 +24,7 @@ class UserPage extends Component {
           localStorage.setItem('TOKEN', this.state.token)
         }
 
-
+        
 
         const url = "/api/user/" + this.props.match.params["userId"];      
 
@@ -32,14 +33,24 @@ class UserPage extends Component {
           headers: {
             'x-access-token': localStorage.getItem('TOKEN')
           }
-          });
-  
+        });
+
+        this.setState({ isLoggedIn: true });
+
+        console.log(this.state.isLoggedIn)
+
+        
+        console.log(response)
+
         this.setState({ admin: response.data['user']['admin'] });
         this.setState({ name: response.data['user']['name'] });
         this.setState({ publicID: response.data['user']['public_id'] });
+      }
 
-
-
+      renderUploadImage() {
+        if (this.state.isLoggedIn) {
+          return <ReactUploadImage />;
+        }
       }
 
 
@@ -78,8 +89,9 @@ class UserPage extends Component {
 
 
 
-            <ReactUploadImage />
+            {/* <ReactUploadImage /> */}
 
+            {this.renderUploadImage()}
 
 
             
