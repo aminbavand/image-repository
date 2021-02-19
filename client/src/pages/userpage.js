@@ -49,7 +49,46 @@ class UserPage extends Component {
 
       renderUploadImage() {
         if (this.state.isLoggedIn) {
-          return <ReactUploadImage />;
+          return (
+          <ReactUploadImage />
+          );
+        }
+      }
+
+
+      renderUserInfo() {
+        if (this.state.isLoggedIn) {
+          return (
+            <div>
+              You have just logged in or signed up.
+              <h2>
+                user information:
+              </h2>
+
+              <div>
+                NAME: {this.state.name}
+              </div>
+
+              <div>
+                ID: {this.state.publicID}
+              </div>
+
+              <div>
+                ADMIN: {String(this.state.admin)}
+              </div>
+            </div>
+          );
+        }
+      }
+
+
+      renderTimeOut() {
+        if (this.state.isLoggedIn==false) {
+          return (
+          <h1>
+            Session Time Out!
+          </h1>
+          );
         }
       }
 
@@ -66,38 +105,22 @@ class UserPage extends Component {
           <div>
     
             
-            You have just logged in or signed up.
-            
+      
 
-            <h2>
-              user information:
-            </h2>
+            {this.renderUserInfo()}
 
-            <div>
-              NAME: {this.state.name}
-            </div>
-
-            <div>
-              ID: {this.state.publicID}
-            </div>
-
-            <div>
-              ADMIN: {String(this.state.admin)}
-            </div>
-
-  
-
-
-
-            {/* <ReactUploadImage /> */}
 
             {this.renderUploadImage()}
-
+            
+            {this.renderTimeOut()}
 
             
             <li><Link to="/home">Home</Link></li>
             <li><Link to="/login">Login Page</Link></li>
             <li><Link to="/signup">Sign Up Page</Link></li>
+
+
+            
 
 
 
