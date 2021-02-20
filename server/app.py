@@ -23,7 +23,12 @@ class User(db.Model):
     name = db.Column(db.String(50))
     password = db.Column(db.String(80))
     admin = db.Column(db.Boolean)
+    images = db.Column(db.Integer)#number of the current user's available images in the server
 
+class ImagesInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(50))
+    name = db.Column(db.String(60))
 
 
 
@@ -71,27 +76,10 @@ def get_all_users(current_user):
         user_data['name'] = user.name
         user_data['password'] = user.password        
         user_data['admin'] = user.admin
+        user_data['images'] = user.images
         output.append(user_data)
 
     return jsonify({'users': output})
-
-
-
-
-@app.route('/user', methods=['DELETE'])
-@token_required
-def delete_all_users(current_user):
-    if not current_user.admin:
-        return jsonify({'message' : 'Cannot perform that function!'})
-
-    users = User.query.all()
-
-    for user in users:
-        db.session.delete(user)
-
-    db.session.commit()
-
-    return jsonify({'message' : 'All users have been deleted!'})
 
 
 
@@ -117,8 +105,8 @@ def promote_user(current_user, public_id):
 @app.route('/user/<public_id>', methods=['GET'])
 @token_required
 def get_one_user(current_user,public_id):
-    # if not current_user.admin and current_user.public_id is not public_id:
-    #     return jsonify({'message' : 'Cannot perform that function!'})
+    if not current_user.admin and (current_user.public_id != public_id):
+        return jsonify({'message' : 'Cannot perform that function!'})
 
     user = User.query.filter_by(public_id=public_id).first()
 
@@ -130,6 +118,7 @@ def get_one_user(current_user,public_id):
     user_data['name'] = user.name
     user_data['password'] = user.password
     user_data['admin'] = user.admin
+    user_data['images'] = user.images
 
     return jsonify({'user' : user_data})
 
@@ -159,48 +148,49 @@ def delete_user(current_user, public_id):
 @app.route('/imageupload', methods=['POST'])
 @token_required
 def image_upload(current_user):
+    current_user.images = current_user.images + 1
+    db.session.commit()
 
     data = request.files['myImage']
-    imagestr = './images/' + data.name
+    
+    imgname = current_user.public_id + str(current_user.images)
+    
+    imagestr = './images/' + imgname
+    
     data.save(imagestr)
 
-    return jsonify({'message' : 'The user has been deleted!'})
+    new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
+
+    db.session.add(new_image)
+    db.session.commit()
+
+    return jsonify({'message' : 'Image Uploaded!'})
 
 
 
+@app.route('/get_images_names/<public_id>', methods=['GET'])
+@token_required
+def get_images_names(current_user):
+
+    images = ImagesInfo.query.filter_by(public_id=public_id).all()
+    names = []
+    for image in images:
+        name = image.name
+        names.append(name)
+
+    return jsonify({'images_names' : names})
 
 
 
+@app.route('/get_image/<public_id>', methods=['POST'])
+@token_required
+def get_image(current_user):
 
+    data = request.get_json()
+    name = data["imagename"]
+    imagestr = './images/' + name
+    return send_file(filename)
 
-
-
-@app.route('/last-user-info', methods=['GET','POST'])
-def last_user():
-    if request.method=='POST':
-        data = request.get_json()
-
-        hashed_password = generate_password_hash(data['password'], method='sha256')
-
-        new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
-
-        db.session.add(new_user)
-        db.session.commit()
-
-        return jsonify({'message' : 'The user has been created!'})
-
-    if request.method=='GET':
-        users = User.query.all()
-        output = []
-
-        user = users[-1]
-        user_data = {}
-        user_data['name'] = user.name
-        user_data['password'] = user.password
-        user_data['admin'] = user.admin
-        output.append(user_data)
-
-        return jsonify({'users': user_data})
 
     
 
@@ -224,7 +214,7 @@ def login():
         return make_response('Could not verify', 401)
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.1)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=2)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
@@ -242,14 +232,14 @@ def signup():
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
 
-    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False)
+    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False, images=0)
 
     db.session.add(new_user)
     db.session.commit()
 
 
 
-    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.1)}, app.config['SECRET_KEY'])
+    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=2)}, app.config['SECRET_KEY'])
 
 
 

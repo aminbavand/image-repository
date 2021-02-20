@@ -28,6 +28,7 @@ class ReactUploadImage extends React.Component {
         await axios.post("/api/imageupload",formData,config)
             .then((response) => {
                 alert("The file is successfully uploaded");
+                window.location.reload();
             }).catch((error) => {
                 window.location.reload();
         });

@@ -10,7 +10,8 @@ class UserPage extends Component {
       publicID: '',
       name: '',
       admin: '',
-      isLoggedIn: false
+      isLoggedIn: false,
+      images: 0
       };
     
     
@@ -20,9 +21,6 @@ class UserPage extends Component {
         if (typeof this.state.token != 'undefined'){
           localStorage.setItem('TOKEN', this.state.token)
         }
-
-        
-
         const url = "/api/user/" + this.props.match.params["userId"];      
 
 
@@ -35,18 +33,16 @@ class UserPage extends Component {
           this.setState({ admin: response.data['user']['admin'] });
           this.setState({ name: response.data['user']['name'] });
           this.setState({ publicID: response.data['user']['public_id'] });
+          this.setState({ images: response.data['user']['images'] });
           this.setState({ isLoggedIn: true });
         }).catch((error) => {
           this.setState({ isLoggedIn: false });
           });
-        
-        
-
-        
-
-
-        
+          
       }
+
+
+
 
       renderUploadImage() {
         if (this.state.isLoggedIn) {
@@ -76,6 +72,10 @@ class UserPage extends Component {
 
               <div>
                 ADMIN: {String(this.state.admin)}
+              </div>
+
+              <div>
+                Number of uploaded images: {this.state.images}
               </div>
             </div>
           );

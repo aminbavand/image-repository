@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import test from './pages/test_sample';
 import AfterSignup from './pages/after_signup';
 import Signup from './pages/signup';
 import Home from './pages/homepage';
@@ -16,7 +15,6 @@ function App() {
         </header> */}
         
         <div>
-          <Route exact path="/" component={test} />
           <Route exact path="/aftersignup" component={AfterSignup} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/home" component={Home} />
