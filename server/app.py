@@ -11,7 +11,7 @@ import base64
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'secretkey12345'#the key which we use to send info
+app.config['SECRET_KEY'] = 'secretkey12345'#the key we use to send info
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
 db = SQLAlchemy(app)
 
@@ -193,16 +193,6 @@ def get_images(current_user,public_id,imagename):
 
     return jsonify({'image_url' : my_string.decode('utf-8')})
 
-    
-
-# with open("yourfile.ext", "rb") as image_file:
-    
-    # imagestr = './images/' + imagename + '.png'
-    # image_file = open(imagestr)
-    # encoded_string = base64.b64encode(image_file.read())
-    
-    # return jsonify({'imagebase64' : 'encoded_string'})
-
 
     
 
@@ -226,7 +216,7 @@ def login():
         return make_response('Could not verify', 401)
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.1)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
@@ -242,6 +232,11 @@ def login():
 def signup():
     data = request.get_json()
 
+
+    exists = db.session.query(db.exists().where(User.name == data['username'])).scalar()
+    if exists is True:
+        return make_response('Could not verify', 401)
+
     hashed_password = generate_password_hash(data['password'], method='sha256')
 
     new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False, images=0)
@@ -251,7 +246,7 @@ def signup():
 
 
 
-    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=0.1)}, app.config['SECRET_KEY'])
+    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
 
 
 
