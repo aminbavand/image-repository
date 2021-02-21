@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt#for creating the token (stands for JSON web token)
 from functools import wraps
 import datetime
+import base64
 
 
 app = Flask(__name__)
@@ -155,7 +156,7 @@ def image_upload(current_user):
     
     imgname = current_user.public_id + str(current_user.images)
     
-    imagestr = './images/' + imgname
+    imagestr = './images/' + imgname + '.png'
     
     data.save(imagestr)
 
@@ -170,7 +171,7 @@ def image_upload(current_user):
 
 @app.route('/get_images_names/<public_id>', methods=['GET'])
 @token_required
-def get_images_names(current_user):
+def get_images_names(current_user,public_id):
 
     images = ImagesInfo.query.filter_by(public_id=public_id).all()
     names = []
@@ -182,14 +183,25 @@ def get_images_names(current_user):
 
 
 
-@app.route('/get_image/<public_id>', methods=['POST'])
+@app.route('/get_images/<public_id>/<imagename>', methods=['GET'])
 @token_required
-def get_image(current_user):
+def get_images(current_user,public_id,imagename):
+    
+    imagestr = './images/' + imagename + '.png'
+    with open(imagestr, "rb") as img_file:
+        my_string = base64.b64encode(img_file.read())
 
-    data = request.get_json()
-    name = data["imagename"]
-    imagestr = './images/' + name
-    return send_file(filename)
+    return jsonify({'image_url' : my_string.decode('utf-8')})
+
+    
+
+# with open("yourfile.ext", "rb") as image_file:
+    
+    # imagestr = './images/' + imagename + '.png'
+    # image_file = open(imagestr)
+    # encoded_string = base64.b64encode(image_file.read())
+    
+    # return jsonify({'imagebase64' : 'encoded_string'})
 
 
     
@@ -214,7 +226,7 @@ def login():
         return make_response('Could not verify', 401)
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=2)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
@@ -239,7 +251,7 @@ def signup():
 
 
 
-    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=2)}, app.config['SECRET_KEY'])
+    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
 
 

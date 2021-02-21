@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import AfterSignup from './pages/after_signup';
 import Signup from './pages/signup';
 import Home from './pages/homepage';
 import Login from './pages/login';
@@ -15,7 +14,6 @@ function App() {
         </header> */}
         
         <div>
-          <Route exact path="/aftersignup" component={AfterSignup} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/home" component={Home} />
           <Route exact path="/login" component={Login} />
