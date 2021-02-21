@@ -88,70 +88,50 @@ class UserPage extends Component {
 
 
       async getimages(){
+        var imagesList = [];
+        for (var i=0; i < this.state.images; i++) {
+          
+          var url3 = "/api/get_images/" + this.props.match.params["userId"] + "/" + this.state.imagesNames[i];
+
+          await axios.get(url3, {
+            headers: {
+              'x-access-token': localStorage.getItem('TOKEN')
+            }
+          })
+          .then((response) => {
+            var imgstr = response.data["image_url"]
+            imagesList.push('data:image/png;base64,'+imgstr);
+          }).catch((error) => {      
+            this.setState({ isLoggedIn: false });
+            });        
+        }
         
-        // for (var i=0; i < this.state.images; i++) {
-        const i=0
-        const url3 = "/api/get_images/" + this.props.match.params["userId"] + "/" + this.state.imagesNames[i];   
-        console.log(url3)
-        await axios.get(url3, {
-          headers: {
-            'x-access-token': localStorage.getItem('TOKEN')
-          }
-        })
-        .then((response) => {
-          // console.log("Hello1")
-          // console.log(response.data["image_url"])
-          // console.log("Hello2")
+        this.setState({imagedata: imagesList})
 
-
-          // let matrixData = response;
-              
-          // let matrixBlob = new Blob([matrixData.data], {type:"image/jpeg"});   
-                
-
-          // let fileReader = new FileReader();
-          // fileReader.readAsDataURL(matrixBlob); 
-
-          // console.log(fileReader)        
-
-          // fileReader.onload = () => { 
-          //     let result = fileReader.result;               
-          //     this.setState({ imagedata: result});           
-          // }
-
-          // var x = new Buffer(response.data, 'binary').toString('base64');
-          // console.log(x);
-          const imgstr = response.data["image_url"]
-          this.setState({imagedata: 'data:image/png;base64,'+imgstr})
-
-
-        }).catch((error) => {      
-          this.setState({ isLoggedIn: false });
-          });
-        
-
-        
       }
 
 
 
 
-      // renderImages(){
-      //   if (this.state.isLoggedIn) {
-      //     var imagesNamesList = [];
-      //     for (var i = 0; i < this.state.images; i++) {
-      //       imagesNamesList.push(this.state.imagesNames[i]);
-      //     }
-      //     return imagesNamesList; 
+      renderImages(){
+        if (this.state.isLoggedIn) {
+          if (this.state.imagedata){
+            
+            var imagesrenders = [<h3>Your images:</h3>]
+            
+            for (var i = 0; i < this.state.images; i++) {
+              imagesrenders.push(
+                <div>
+                  <img src={this.state.imagedata[i]} width="300" />
+                </div>              
+              )
+            }
+            return imagesrenders
+          }
+        }
+      }
 
-      //   }
-      // }
 
-      // renderImage(i){
-      //     return (
-      //       this.state.imagesNames[i]
-      //     );
-      //   }
       
 
 
@@ -168,26 +148,23 @@ class UserPage extends Component {
         if (this.state.isLoggedIn) {
           return (
             <div>
-              You have just logged in or signed up.
-              <h2>
-                user information:
-              </h2>
 
-              <div>
-                NAME: {this.state.name}
-              </div>
 
-              <div>
-                ID: {this.state.publicID}
-              </div>
+              <h3>
+                Hello {this.state.name}! Welcome to your image repository!
+              </h3>
 
-              <div>
-                ADMIN: {String(this.state.admin)}
-              </div>
+              <h3>
+                Your public ID is: {this.state.publicID}
+              </h3>
 
-              <div>
-                Number of uploaded images: {this.state.images}
-              </div>
+              <h3>
+                Your admin status is: {String(this.state.admin)}
+              </h3>
+
+              <h3>
+                You have uploaded {this.state.images} images so far.
+              </h3>
             </div>
           );
         }
@@ -220,17 +197,13 @@ class UserPage extends Component {
             {this.renderUserInfo()}
 
 
-            {this.renderUploadImage()}
-            
-            {this.renderTimeOut()}
 
-     
-            <img src={this.state.imagedata} width="150" />
-   
-            {/* <img             
-            src="https://i.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI"
-            alt="new"
-            /> */}
+            {this.renderImages()}
+
+            {this.renderUploadImage()}
+
+
+            {this.renderTimeOut()}
 
 
             <li><Link to="/home">Home</Link></li>
