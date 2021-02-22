@@ -20,14 +20,14 @@ after_success:
   - docker push aminbavand/multi-nginx
   - docker push aminbavand/multi-server
 
-# deploy:
-#   provider: elasticbeanstalk
-#   region: "us-east-2"
-#   app: "multi-docker"
-#   env: "Multidocker-env"
-#   bucket_name: "elasticbeanstalk-us-east-2-710852728941"
-#   bucket_path: "docker-multi"
-#   on:
-#     branch: master
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key: $AWS_SECRET_KEY
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-2"
+  app: "image-repo"
+  env: "Imagerepo-env"
+  bucket_name: "elasticbeanstalk-us-east-2-710852728941"
+  bucket_path: "image-repo"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
