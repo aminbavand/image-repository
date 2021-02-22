@@ -253,7 +253,9 @@ def signup():
     return jsonify({'token' : token, 'publicID': new_user.public_id})
 
 
-
+@app.route('/test', methods=['GET'])
+def test_api():    
+    return jsonify({'message':'Hello'})
 
 
 
