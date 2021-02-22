@@ -7,12 +7,20 @@ import jwt#for creating the token (stands for JSON web token)
 from functools import wraps
 import datetime
 import base64
+import os
+
+
+
 
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'secretkey12345'#the key we use to send info
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
+pguser = os.environ['PGUSER']
+pgpass = os.environ['PGPASSWORD']
+pgdb = os.environ['PGDATABASE']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + pguser + ':' + pgpass + '@db/' + pgdb
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
 db = SQLAlchemy(app)
 
 
@@ -253,9 +261,14 @@ def signup():
     return jsonify({'token' : token, 'publicID': new_user.public_id})
 
 
-@app.route('/test', methods=['GET'])
+@app.route('/test1', methods=['GET'])
 def test_api():    
     return jsonify({'message':'Hello'})
+
+@app.route('/test2', methods=['GET'])
+def test_api():    
+    a = os.environ['PGUSER']
+    return jsonify({'message':a})
 
 
 
