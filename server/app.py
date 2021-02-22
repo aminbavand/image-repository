@@ -262,11 +262,11 @@ def signup():
 
 
 @app.route('/test1', methods=['GET'])
-def test_api():    
+def test_api1():    
     return jsonify({'message':'Hello'})
 
 @app.route('/test2', methods=['GET'])
-def test_api():    
+def test_api2():    
     a = os.environ['PGUSER']
     return jsonify({'message':a})
 
