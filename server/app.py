@@ -158,6 +158,28 @@ def delete_user(current_user, public_id):
 
 
 
+# @app.route('/imageupload', methods=['POST'])
+# @token_required
+# def image_upload(current_user):
+#     current_user.images = current_user.images + 1
+#     db.session.commit()
+
+#     data = request.files['myImage']
+    
+#     imgname = current_user.public_id + str(current_user.images)
+    
+#     imagestr = './images/' + imgname + '.png'
+    
+#     data.save(imagestr)
+
+#     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
+
+#     db.session.add(new_image)
+#     db.session.commit()
+
+#     return jsonify({'message' : 'Image Uploaded!'})
+
+
 @app.route('/imageupload', methods=['POST'])
 @token_required
 def image_upload(current_user):
@@ -168,9 +190,12 @@ def image_upload(current_user):
     
     imgname = current_user.public_id + str(current_user.images)
     
-    imagestr = './images/' + imgname + '.png'
-    
+    imagestr = './images/' + imgname + '.png'    
     data.save(imagestr)
+
+    bashCommand = "aws s3 cp " + "\"" + imagestr + + "\"" + " s3://my-image-repository-storage/"
+    os.system(bashCommand)
+
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
 
@@ -195,12 +220,28 @@ def get_images_names(current_user,public_id):
 
 
 
+# @app.route('/get_images/<public_id>/<imagename>', methods=['GET'])
+# @token_required
+# def get_images(current_user,public_id,imagename):
+    
+#     imagestr = './images/' + imagename + '.png'
+#     with open(imagestr, "rb") as img_file:
+#         my_string = base64.b64encode(img_file.read())
+
+#     return jsonify({'image_url' : my_string.decode('utf-8')})
+
+
 @app.route('/get_images/<public_id>/<imagename>', methods=['GET'])
 @token_required
 def get_images(current_user,public_id,imagename):
     
     imagestr = './images/' + imagename + '.png'
-    with open(imagestr, "rb") as img_file:
+    imgnm = imagename + ".png"
+
+    bashCommand = "aws s3 cp s3://my-image-repository-storage/" + imgnm + " ./"
+    os.system(bashCommand)
+    
+    with open(imgnm, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
 
     return jsonify({'image_url' : my_string.decode('utf-8')})
@@ -297,6 +338,3 @@ def tables_deletion():
 if __name__ == '__main__':
 
     app.run(host='0.0.0.0',debug=True)
-
-
-
