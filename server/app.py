@@ -188,18 +188,10 @@ def delete_user(current_user, public_id):
 @token_required
 def image_upload(current_user):
 
-
     f = request.files['myImage']
-
-    imgname = current_user.public_id + str(current_user.images)
     imagestr = imgname + '.png'
-
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
-
-
-
-    imgadrs = "./uploads/" + imagestr
-    upload_file(imgadrs, BUCKET)
+    upload_file(f"uploads/{imagestr}", BUCKET)
 
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
@@ -242,8 +234,9 @@ def get_images_names(current_user,public_id):
 def get_images(current_user,public_id,imagename):
     
 
-    imgnm = imagename + ".png"
-    output = download_file(imgnm, BUCKET)
+    imagestr = imagename + ".png"
+
+    output = download_file(f"uploads/{imagestr}", BUCKET)
     imgpath = "./downloads" + imgnm
     
     with open(imgpath, "rb") as img_file:
