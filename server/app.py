@@ -8,9 +8,11 @@ from functools import wraps
 import datetime
 import base64
 import os
+from s3_demo import list_files, download_file, upload_file
 
 
-
+UPLOAD_FOLDER = "uploads"
+BUCKET = "my-image-repository-storage"
 
 
 app = Flask(__name__)
@@ -168,7 +170,7 @@ def delete_user(current_user, public_id):
     
 #     imgname = current_user.public_id + str(current_user.images)
     
-#     imagestr = './images/' + imgname + '.png'
+#     imagestr = './uploads/' + imgname + '.png'
     
 #     data.save(imagestr)
 
@@ -180,21 +182,20 @@ def delete_user(current_user, public_id):
 #     return jsonify({'message' : 'Image Uploaded!'})
 
 
+
 @app.route('/imageupload', methods=['POST'])
 @token_required
 def image_upload(current_user):
     current_user.images = current_user.images + 1
     db.session.commit()
 
-    data = request.files['myImage']
+    f = request.files['myImage']
     
     imgname = current_user.public_id + str(current_user.images)
-    
-    imagestr = './images/' + imgname + '.png'    
-    data.save(imagestr)
-
-    bashCommand = "aws s3 cp " + "\"" + imagestr + + "\"" + " s3://my-image-repository-storage/"
-    os.system(bashCommand)
+    imagestr = imgname + '.png'
+     
+    f.save(os.path.join(UPLOAD_FOLDER, imagestr))
+    upload_file(f"uploads/{imagestr}", BUCKET)
 
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
@@ -224,7 +225,7 @@ def get_images_names(current_user,public_id):
 # @token_required
 # def get_images(current_user,public_id,imagename):
     
-#     imagestr = './images/' + imagename + '.png'
+#     imagestr = './uploads/' + imagename + '.png'
 #     with open(imagestr, "rb") as img_file:
 #         my_string = base64.b64encode(img_file.read())
 
@@ -235,11 +236,10 @@ def get_images_names(current_user,public_id):
 @token_required
 def get_images(current_user,public_id,imagename):
     
-    imagestr = './images/' + imagename + '.png'
-    imgnm = imagename + ".png"
 
-    bashCommand = "aws s3 cp s3://my-image-repository-storage/" + imgnm + " ./"
-    os.system(bashCommand)
+    imgnm = imagename + ".png"
+    output = download_file(imgnm, BUCKET)
+
     
     with open(imgnm, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
