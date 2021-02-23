@@ -102,7 +102,7 @@ class UserPage extends Component {
             var imgstr = response.data["image_url"]
             imagesList.push('data:image/png;base64,'+imgstr);
           }).catch((error) => {      
-            this.setState({ isLoggedIn: false });
+            // this.setState({ isLoggedIn: false });
             });        
         }
         

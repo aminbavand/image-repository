@@ -11,8 +11,9 @@ import os
 from s3_demo import list_files, download_file, upload_file
 
 
+
 UPLOAD_FOLDER = "uploads"
-BUCKET = "my-image-repository-storage"
+BUCKET = "elasticbeanstalk-us-east-2-710852728941"
 
 
 app = Flask(__name__)
@@ -186,19 +187,23 @@ def delete_user(current_user, public_id):
 @app.route('/imageupload', methods=['POST'])
 @token_required
 def image_upload(current_user):
-    current_user.images = current_user.images + 1
-    db.session.commit()
+
 
     f = request.files['myImage']
-    
+
     imgname = current_user.public_id + str(current_user.images)
     imagestr = imgname + '.png'
-     
+
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
-    upload_file(f"uploads/{imagestr}", BUCKET)
+
+
+
+    imgadrs = "./uploads/" + imagestr
+    upload_file(imgadrs, BUCKET)
 
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
+    current_user.images = current_user.images + 1
 
     db.session.add(new_image)
     db.session.commit()
@@ -239,9 +244,9 @@ def get_images(current_user,public_id,imagename):
 
     imgnm = imagename + ".png"
     output = download_file(imgnm, BUCKET)
-
+    imgpath = "./downloads" + imgnm
     
-    with open(imgnm, "rb") as img_file:
+    with open(imgpath, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
 
     return jsonify({'image_url' : my_string.decode('utf-8')})
@@ -269,7 +274,7 @@ def login():
         return make_response('Could not verify', 401)
 
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
+        token = jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
         return jsonify({'token' : token, 'publicID': user.public_id})
 
@@ -299,7 +304,7 @@ def signup():
 
 
 
-    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)}, app.config['SECRET_KEY'])
+    token = jwt.encode({'public_id' : new_user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
 
 
