@@ -31,3 +31,11 @@ deploy:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_KEY
+
+
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  bucket_name: "elasticbeanstalk-us-east-2-710852728941"
+  bucket_path: "image-repo"
+  skip_cleanup: true
