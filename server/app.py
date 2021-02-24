@@ -240,9 +240,8 @@ def get_images(current_user,public_id,imagename):
     imagestr = imagename + ".png"
 
     output = download_file(imagestr, BUCKET)
-    imgpath = "./images/" + imagestr
     
-    with open(imgpath, "rb") as img_file:
+    with open(output, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
 
     return jsonify({'image_url' : my_string.decode('utf-8')})
