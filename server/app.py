@@ -189,9 +189,10 @@ def delete_user(current_user, public_id):
 def image_upload(current_user):
 
     f = request.files['myImage']
+    imgname = current_user.public_id + str(current_user.images)
     imagestr = imgname + '.png'
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
-    imgadrs = "./uploads/" + imagestr
+    imgadrs = "uploads/" + imagestr
     upload_file(imgadrs, BUCKET)
 
 
@@ -236,7 +237,7 @@ def get_images(current_user,public_id,imagename):
     
 
     imagestr = imagename + ".png"
-    imgadrs = "./uploads/" + imagestr
+    imgadrs = "uploads/" + imagestr
 
     output = download_file(imgadrs, BUCKET)
     imgpath = "./downloads" + imgnm
