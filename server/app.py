@@ -237,9 +237,8 @@ def get_images(current_user,public_id,imagename):
     
 
     imagestr = imagename + ".png"
-    imgadrs = "uploads/" + imagestr
 
-    output = download_file(imgadrs, BUCKET)
+    output = download_file(imagestr, BUCKET)
     imgpath = "./downloads" + imgnm
     
     with open(imgpath, "rb") as img_file:
