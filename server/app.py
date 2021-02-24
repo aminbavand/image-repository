@@ -26,8 +26,8 @@ pghost = os.environ['PGHOST']
 
 
 app.config['SECRET_KEY'] = 'secretkey12345'#the key we use to send info
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
 db = SQLAlchemy(app)
 
 
