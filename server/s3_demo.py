@@ -17,8 +17,8 @@ def download_file(file_name, bucket):
     Function to download a given file from an S3 bucket
     """
     s3 = boto3.resource('s3')
-    output = f"downloads/{file_name}"
-    imgadrs = "uploads/" + file_name
+    output = f"./images/{file_name}"
+    imgadrs = "images/" + file_name
     s3.Bucket(bucket).download_file(imgadrs, output)
 
     return output

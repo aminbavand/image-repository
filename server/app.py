@@ -12,7 +12,7 @@ from s3_demo import list_files, download_file, upload_file
 
 
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "images"
 BUCKET = "elasticbeanstalk-us-east-2-710852728941"
 
 
@@ -26,8 +26,8 @@ pghost = os.environ['PGHOST']
 
 
 app.config['SECRET_KEY'] = 'secretkey12345'#the key we use to send info
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres_password@db/postgres'
 db = SQLAlchemy(app)
 
 
@@ -164,18 +164,19 @@ def delete_user(current_user, public_id):
 # @app.route('/imageupload', methods=['POST'])
 # @token_required
 # def image_upload(current_user):
-#     current_user.images = current_user.images + 1
-#     db.session.commit()
+#     # current_user.images = current_user.images + 1
+#     # db.session.commit()
 
 #     data = request.files['myImage']
     
 #     imgname = current_user.public_id + str(current_user.images)
     
-#     imagestr = './uploads/' + imgname + '.png'
+#     imagestr = './images/' + imgname + '.png'
     
 #     data.save(imagestr)
 
 #     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
+#     current_user.images = current_user.images + 1
 
 #     db.session.add(new_image)
 #     db.session.commit()
@@ -192,7 +193,7 @@ def image_upload(current_user):
     imgname = current_user.public_id + str(current_user.images)
     imagestr = imgname + '.png'
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
-    imgadrs = "uploads/" + imagestr
+    imgadrs = "images/" + imagestr
     upload_file(imgadrs, BUCKET)
 
 
@@ -224,7 +225,7 @@ def get_images_names(current_user,public_id):
 # @token_required
 # def get_images(current_user,public_id,imagename):
     
-#     imagestr = './uploads/' + imagename + '.png'
+#     imagestr = './images/' + imagename + '.png'
 #     with open(imagestr, "rb") as img_file:
 #         my_string = base64.b64encode(img_file.read())
 
@@ -239,7 +240,7 @@ def get_images(current_user,public_id,imagename):
     imagestr = imagename + ".png"
 
     output = download_file(imagestr, BUCKET)
-    imgpath = "./downloads/" + imagestr
+    imgpath = "./images/" + imagestr
     
     with open(imgpath, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
