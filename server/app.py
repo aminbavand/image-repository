@@ -239,7 +239,7 @@ def get_images(current_user,public_id,imagename):
     imagestr = imagename + ".png"
 
     output = download_file(imagestr, BUCKET)
-    imgpath = "./downloads" + imgnm
+    imgpath = "./downloads/" + imagestr
     
     with open(imgpath, "rb") as img_file:
         my_string = base64.b64encode(img_file.read())
