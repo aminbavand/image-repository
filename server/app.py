@@ -191,7 +191,8 @@ def image_upload(current_user):
     f = request.files['myImage']
     imagestr = imgname + '.png'
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
-    upload_file(f"uploads/{imagestr}", BUCKET)
+    imgadrs = "./uploads/" + imagestr
+    upload_file(imgadrs, BUCKET)
 
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
@@ -235,8 +236,9 @@ def get_images(current_user,public_id,imagename):
     
 
     imagestr = imagename + ".png"
+    imgadrs = "./uploads/" + imagestr
 
-    output = download_file(f"uploads/{imagestr}", BUCKET)
+    output = download_file(imgadrs, BUCKET)
     imgpath = "./downloads" + imgnm
     
     with open(imgpath, "rb") as img_file:
