@@ -267,7 +267,9 @@ def get_images(current_user,public_id,imagename):
 #     db.session.delete(image)
 #     db.session.commit()
 
-#     return jsonify({'message' : 'image deleted'})
+#     imagestr = data["deletename"] + ".png"
+
+#     return jsonify({'message' : imagestr})
 
 
 @app.route('/imagedelete', methods=['POST'])
@@ -284,9 +286,9 @@ def image_delete(current_user):
     db.session.commit()
 
     imagestr = data["deletename"] + ".png"
-    output = delete_file(imagestr, BUCKET)
+    delete_file(imagestr, BUCKET)
 
-    return jsonify({'message' : 'image deleted'})
+    return jsonify({'message' : imagestr})
 
 
 

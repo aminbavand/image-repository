@@ -124,11 +124,11 @@ class UserPage extends Component {
         const deletename = this.state.imagesNames[deleteNumber]
         await axios.post('/api/imagedelete',{"deletename":deletename},config)
         .then((response) => {
-          console.log(response.data)
+          // console.log(response.data)
           window.location.reload();
         }).catch((error) => {
-          console.log("error")
-          // window.location.reload();
+          // console.log("error")
+          window.location.reload();
         });
 
         // console.log(deletename)
