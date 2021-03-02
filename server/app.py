@@ -8,7 +8,7 @@ from functools import wraps
 import datetime
 import base64
 import os
-from s3_demo import list_files, download_file, upload_file
+from s3_demo import list_files, download_file, upload_file, delete_file
 
 
 
@@ -39,7 +39,8 @@ class User(db.Model):
     name = db.Column(db.String(50))
     password = db.Column(db.String(80))
     admin = db.Column(db.Boolean)
-    images = db.Column(db.Integer)#number of the current user's available images in the server
+    imagesNumNow = db.Column(db.Integer)#number of the current user's available images in the server
+    imagesNumAll = db.Column(db.Integer)#number of the current users all uploads
 
 class ImagesInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -92,7 +93,7 @@ def get_all_users(current_user):
         user_data['name'] = user.name
         user_data['password'] = user.password        
         user_data['admin'] = user.admin
-        user_data['images'] = user.images
+        user_data['images'] = user.imagesNumNow
         output.append(user_data)
 
     return jsonify({'users': output})
@@ -134,7 +135,7 @@ def get_one_user(current_user,public_id):
     user_data['name'] = user.name
     user_data['password'] = user.password
     user_data['admin'] = user.admin
-    user_data['images'] = user.images
+    user_data['images'] = user.imagesNumNow
 
     return jsonify({'user' : user_data})
 
@@ -164,19 +165,18 @@ def delete_user(current_user, public_id):
 # @app.route('/imageupload', methods=['POST'])
 # @token_required
 # def image_upload(current_user):
-#     # current_user.images = current_user.images + 1
-#     # db.session.commit()
 
 #     data = request.files['myImage']
     
-#     imgname = current_user.public_id + str(current_user.images)
+#     imgname = current_user.public_id + str(current_user.imagesNumAll)
     
 #     imagestr = './images/' + imgname + '.png'
     
 #     data.save(imagestr)
 
 #     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
-#     current_user.images = current_user.images + 1
+#     current_user.imagesNumAll = current_user.imagesNumAll + 1
+#     current_user.imagesNumNow = current_user.imagesNumNow + 1
 
 #     db.session.add(new_image)
 #     db.session.commit()
@@ -190,7 +190,7 @@ def delete_user(current_user, public_id):
 def image_upload(current_user):
 
     f = request.files['myImage']
-    imgname = current_user.public_id + str(current_user.images)
+    imgname = current_user.public_id + str(current_user.imagesNumAll)
     imagestr = imgname + '.png'
     f.save(os.path.join(UPLOAD_FOLDER, imagestr))
     imgadrs = "images/" + imagestr
@@ -198,7 +198,8 @@ def image_upload(current_user):
 
 
     new_image = ImagesInfo(public_id=current_user.public_id, name=imgname)
-    current_user.images = current_user.images + 1
+    current_user.imagesNumAll = current_user.imagesNumAll + 1
+    current_user.imagesNumNow = current_user.imagesNumNow + 1
 
     db.session.add(new_image)
     db.session.commit()
@@ -232,6 +233,7 @@ def get_images_names(current_user,public_id):
 #     return jsonify({'image_url' : my_string.decode('utf-8')})
 
 
+
 @app.route('/get_images/<public_id>/<imagename>', methods=['GET'])
 @token_required
 def get_images(current_user,public_id,imagename):
@@ -247,7 +249,46 @@ def get_images(current_user,public_id,imagename):
     return jsonify({'image_url' : my_string.decode('utf-8')})
 
 
+
+
+# @app.route('/imagedelete', methods=['POST'])
+# @token_required
+# def image_delete(current_user):
     
+#     data = request.get_json()
+    
+#     imagestr = './images/' + data["deletename"] + '.png'
+#     os.remove(imagestr)
+    
+#     image = ImagesInfo.query.filter_by(name=data["deletename"]).first()
+
+#     current_user.imagesNumNow = current_user.imagesNumNow -1
+
+#     db.session.delete(image)
+#     db.session.commit()
+
+#     return jsonify({'message' : 'image deleted'})
+
+
+@app.route('/imagedelete', methods=['POST'])
+@token_required
+def image_delete(current_user):
+    
+    data = request.get_json()
+
+    imagestr = data["deletename"] + ".png"
+    output = delete_file(imagestr, BUCKET)
+    
+    image = ImagesInfo.query.filter_by(name=data["deletename"]).first()
+
+    current_user.imagesNumNow = current_user.imagesNumNow -1
+
+    db.session.delete(image)
+    db.session.commit()
+
+    return jsonify({'message' : 'image deleted'})
+
+
 
 
 
@@ -292,7 +333,7 @@ def signup():
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
 
-    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False, images=0)
+    new_user = User(public_id=str(uuid.uuid4()), name=data['username'], password=hashed_password, admin=False, imagesNumAll=0, imagesNumNow=0)
 
     db.session.add(new_user)
     db.session.commit()
@@ -304,6 +345,8 @@ def signup():
 
 
     return jsonify({'token' : token, 'publicID': new_user.public_id})
+
+
 
 
 @app.route('/test1', methods=['GET'])
@@ -323,6 +366,10 @@ def test_api2():
 
 
 
+
+
+
+
 @app.route('/createdatabase', methods=['GET'])
 def database_creation():    
     db.create_all()
@@ -333,6 +380,23 @@ def database_creation():
 def tables_deletion():    
     db.drop_all()
     return jsonify({'message':'tables deleted'})
+
+
+@app.route('/firstadmin/<public_id>', methods=['GET'])
+def first_admin(public_id):
+
+    user = User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' : 'No user found!'})
+
+    user.admin = True
+    db.session.commit()
+
+    return jsonify({'message' : 'The user has been promoted!'})
+
+
+
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ReactUploadImage from './imageUpload';
+import ImagesRender from './imagesRender';
 
 
 class UserPage extends Component {
@@ -93,6 +94,8 @@ class UserPage extends Component {
           
           var url3 = "/api/get_images/" + this.props.match.params["userId"] + "/" + this.state.imagesNames[i];
 
+          // var url3 = "/api/get_images/" + this.props.match.params["userId"] + "/" + String(i);
+
           await axios.get(url3, {
             headers: {
               'x-access-token': localStorage.getItem('TOKEN')
@@ -105,28 +108,42 @@ class UserPage extends Component {
             // this.setState({ isLoggedIn: false });
             });        
         }
-        
         this.setState({imagedata: imagesList})
-
       }
 
+      
+      // async deleteImage(deleteNumber){
+      deleteImage = async (deleteNumber) =>{
+
+
+        const config = {
+          headers: {
+            'x-access-token': localStorage.getItem('TOKEN')
+          }
+        };
+        const deletename = this.state.imagesNames[deleteNumber]
+        await axios.post('/api/imagedelete',{"deletename":deletename},config)
+        .then((response) => {
+          console.log(response.data)
+          window.location.reload();
+        }).catch((error) => {
+          console.log("error")
+          // window.location.reload();
+        });
+
+        // console.log(deletename)
+
+      }
 
 
 
       renderImages(){
         if (this.state.isLoggedIn) {
           if (this.state.imagedata){
-            
-            var imagesrenders = [<h3>Your images:</h3>]
-            
-            for (var i = 0; i < this.state.images; i++) {
-              imagesrenders.push(
-                <div>
-                  <img src={this.state.imagedata[i]} width="300" />
-                </div>              
-              )
-            }
-            return imagesrenders
+            return (
+              <ImagesRender imagedata={this.state.imagedata} images={this.state.images}
+               imageDeleteNumberCallback={this.deleteImage}/>
+            );
           }
         }
       }
