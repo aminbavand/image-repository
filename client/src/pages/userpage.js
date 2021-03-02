@@ -112,7 +112,7 @@ class UserPage extends Component {
       }
 
       
-      // async deleteImage(deleteNumber){
+
       deleteImage = async (deleteNumber) =>{
 
 

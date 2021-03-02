@@ -275,9 +275,6 @@ def get_images(current_user,public_id,imagename):
 def image_delete(current_user):
     
     data = request.get_json()
-
-    imagestr = data["deletename"] + ".png"
-    output = delete_file(imagestr, BUCKET)
     
     image = ImagesInfo.query.filter_by(name=data["deletename"]).first()
 
@@ -285,6 +282,9 @@ def image_delete(current_user):
 
     db.session.delete(image)
     db.session.commit()
+
+    imagestr = data["deletename"] + ".png"
+    output = delete_file(imagestr, BUCKET)
 
     return jsonify({'message' : 'image deleted'})
 
@@ -353,19 +353,15 @@ def signup():
 def test_api1():    
     return jsonify({'message':'Hello'})
 
-@app.route('/test2', methods=['GET'])
-def test_api2():    
-    pguser = os.environ['PGUSER']
-    pgpass = os.environ['PGPASSWORD']
-    pgdb = os.environ['PGDATABASE']
-    pghost = os.environ['PGHOST']
+# @app.route('/test2', methods=['GET'])
+# def test_api2():    
+#     pguser = os.environ['PGUSER']
+#     pgpass = os.environ['PGPASSWORD']
+#     pgdb = os.environ['PGDATABASE']
+#     pghost = os.environ['PGHOST']
 
-    a = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
-    return jsonify({'message':a})
-
-
-
-
+#     a = 'postgresql://' + pguser + ':' + pgpass + '@' + pghost + '/' + pgdb
+#     return jsonify({'message':a})
 
 
 
@@ -382,18 +378,18 @@ def tables_deletion():
     return jsonify({'message':'tables deleted'})
 
 
-@app.route('/firstadmin/<public_id>', methods=['GET'])
-def first_admin(public_id):
+# @app.route('/firstadmin/<public_id>', methods=['GET'])
+# def first_admin(public_id):
 
-    user = User.query.filter_by(public_id=public_id).first()
+#     user = User.query.filter_by(public_id=public_id).first()
 
-    if not user:
-        return jsonify({'message' : 'No user found!'})
+#     if not user:
+#         return jsonify({'message' : 'No user found!'})
 
-    user.admin = True
-    db.session.commit()
+#     user.admin = True
+#     db.session.commit()
 
-    return jsonify({'message' : 'The user has been promoted!'})
+#     return jsonify({'message' : 'The user has been promoted!'})
 
 
 

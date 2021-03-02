@@ -45,9 +45,10 @@ def delete_file(file_name, bucket):
     Function to delete a given file from an S3 bucket
     """
 
-    s3 = boto3.client('s3')
-    imgadrs = "images/" + file_name
+    imgadrs = "images/" + file_name  
 
-    s3.delete_object(Bucket=bucket, Key=imgadrs)
+    s3 = boto3.resource('s3')
+    s3.Object(bucket, imgadrs).delete()
+
 
     return imgadrs
